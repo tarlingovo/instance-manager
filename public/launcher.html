@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instance Manager Launcher</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>App Launcher</h1>
+        <p>Choose how many instances of the app to launch. They will be tiled across your screen as pop-up windows.</p>
+
+        <div class="launcher-controls">
+            <label for="instance-count">Number of instances:</label>
+            <input type="number" id="instance-count" value="4" min="1" max="25">
+            <button id="launch-button">Launch Apps</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('launch-button').addEventListener('click', () => {
+            const numInstances = parseInt(document.getElementById('instance-count').value, 10);
+            if (isNaN(numInstances) || numInstances < 1) {
+                alert('Please enter a valid number of instances.');
+                return;
+            }
+
+            // Use screen.availWidth/Height to account for OS taskbars etc.
+            const screenWidth = window.screen.availWidth;
+            const screenHeight = window.screen.availHeight;
+
+            // Calculate the most "square" grid layout
+            const cols = Math.ceil(Math.sqrt(numInstances));
+            const rows = Math.ceil(numInstances / cols);
+
+            // Calculate dimensions for each pop-up window
+            const windowWidth = Math.floor(screenWidth / cols);
+            const windowHeight = Math.floor(screenHeight / rows);
+
+            for (let i = 0; i < numInstances; i++) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+
+                const left = col * windowWidth;
+                const top = row * windowHeight;
+
+                // Use a unique name for each window to ensure they open separately
+                const windowName = `instance_${i}`;
+
+                // Specify the URL to the main app page
+                const url = 'index.html';
+
+                // const windowFeatures = `width=${windowWidth},height=${windowHeight},left=${left},top=${top},popup=yes`;
+                const windowFeatures = `width=${windowWidth},height=${windowHeight},screenX=${left},screenY=${top},popup=yes`;
+                console.log(windowFeatures)
+
+                window.open(url, windowName, windowFeatures);
+            }
+        });
+    </script>
+</body>
+
+</html>

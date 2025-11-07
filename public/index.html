@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instance Manager Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dormant">
+    <div class="container">
+        <h1>Instance Manager Demo</h1>
+        <p class="status" id="status">Initializing...</p>
+
+        <div class="info-grid">
+            <div class="info-card" id="active-card">
+                <div class="info-label">Status</div>
+                <div class="info-value" id="active-status">Dormant</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Other Instances</div>
+                <div class="info-value" id="instance-count">0</div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>How to test:</h2>
+            <p>1. Open this page in multiple browser tabs or windows</p>
+            <p>2. Only one instance will be active (green background) at a time</p>
+            <p>3. Close the active tab to see another instance immediately become active</p>
+            <p>4. The counter shows how many other dormant instances exist</p>
+        </div>
+
+        <div class="instance-id">
+            Instance ID: <span id="instance-id">Loading...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the InstanceManager
+        import { InstanceManager } from './InstanceManager.js';
+
+        // Create a new instance manager with app key "demo-app"
+        const manager = new InstanceManager('demo-app', (state) => {
+            updateUI(state);
+        });
+
+        // Display instance ID
+        document.getElementById('instance-id').textContent = manager.instanceId;
+
+        // Update UI based on state
+        function updateUI(state) {
+            const body = document.body;
+            const status = document.getElementById('status');
+            const activeCard = document.getElementById('active-card');
+            const activeStatus = document.getElementById('active-status');
+            const instanceCount = document.getElementById('instance-count');
+
+            if (state.isActive) {
+                body.className = 'active';
+                activeCard.classList.add('active');
+                activeStatus.textContent = 'Active';
+                activeStatus.classList.add('pulse');
+                status.textContent = '✓ This instance is active';
+            } else {
+                body.className = 'dormant';
+                activeCard.classList.remove('active');
+                activeStatus.textContent = 'Dormant';
+                activeStatus.classList.remove('pulse');
+                status.textContent = 'This instance is dormant';
+            }
+
+            instanceCount.textContent = state.instanceCount;
+        }
+
+        // Initial state update
+        updateUI(manager.getState());
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            manager.destroy();
+        });
+    </script>
+</body>
+
+</html>
